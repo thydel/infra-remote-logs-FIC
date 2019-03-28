@@ -23,8 +23,11 @@ cmp: $(ascsig); @echo $(^:$h/%=%) | xargs -n1 | xargs -i cmp $h/{} $s/{}
 
 $h/%.asc: $h/%; test -f $@ || gpg -ba $< && chmod 444 $@
 
-main := get sig put chk cmp
+main := get sig put chk
 main: $(main)
+
+cmp := put cmp
+full: $(main) $(cmp)
 
 mk := hashdeep_space_remote_log.mk
 rmk := /usr/local/bin/$(mk)
@@ -40,5 +43,5 @@ dry := DRY := -n
 vartar := dry run
 $(vartar):; @: $(eval $($@))
 
-.PHONY: top $(main) sync init $(vartar)
+.PHONY: top $(main) cmp sync init $(vartar)
 
