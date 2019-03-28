@@ -3,6 +3,8 @@
 top:; @date
 .PHONY: top
 
+$(MAKEFILE_LIST):;
+
 s := hashdeep
 b := /space/remote_logs
 n ?= 1
@@ -23,7 +25,9 @@ z := $b/.$s/$(subst /,-,$d).$s
 $z: $h; @mkdir -p $(@D); $(call g, $(^:$b/%=%)) | tee $@
 
 hash: $z; 
-check: $z $c; @echo -n $(basename $(<F)) ' '; $(call g, $(c:$b/%.audit=%.txt), -k $< -a)
-clean: $c; rm $^
+check  = echo -n $(basename $(<F)) ' ';
+check += $(call g, $(c:$b/%.audit=%.txt), -k $< -a);
+check: $z $c; @$($@)
+clean: $c; @rm $^
 
 .PHONY: hash check clean
