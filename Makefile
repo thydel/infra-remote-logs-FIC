@@ -14,11 +14,13 @@ rsync = rsync -aCv
 get: $h $s; mkdir -p $^; echo $^ | xargs -n1 | xargs -i $(rsync) $(DRY) root@$(loghost):$b/{} .
 put:; $(rsync) $(DRY) --exclude '*$h' $h/ root@$(loghost):$b/$s
 
+month != date +%Y-%m
+match ?= $(month)
 hashdeep := $(wildcard $h/*$h)
 ascsig := $(hashdeep:%=%.asc)
 
 sig: $(ascsig)
-chk: $(hashdeep); @echo $^ | xargs -n1 | xargs -i gpg --verify {}.asc {}
+chk: $(hashdeep); @echo $^ | xargs -n1 | grep $(match) | xargs -i gpg --verify {}.asc {}
 cmp: $(ascsig); @echo $(^:$h/%=%) | xargs -n1 | xargs -i cmp $h/{} $s/{}
 
 $h/%.asc: $h/%; test -f $@ || gpg -ba $< && chmod 444 $@
